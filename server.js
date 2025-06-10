@@ -81,6 +81,9 @@ app.get("/",async(req,res)=>{
 
 // Signup route
 app.post('/signup', async (req, res) => {
+   if (req.session && req.session.user) {
+    return res.redirect('dashboard')
+  }
   console.log(req.body);
   var { email, password } = req.body;
   var hashed = await bcrypt.hash(password, 10);
@@ -94,6 +97,9 @@ app.post('/signup', async (req, res) => {
 
 // Login route
 app.post('/login', async (req, res) => {
+   if (req.session && req.session.user) {
+    return res.redirect('dashboard')
+  }
   var { email, password } = req.body;
   var user = await User.findOne({ email });
   if (!user) return res.render("signup",{user:false});
@@ -145,14 +151,14 @@ app.post('/delete/:id',async(req,res)=>{
 app.get('/login', (req, res) => {
   // If user already logged in, redirect to dashboard
   if (req.session && req.session.user) {
-    return res.render('login', { user: true });
+    return res.redirect('dashboard')
   }
   return res.render('login', { user: false });
 });
 
 app.get('/signup', (req, res) => {
   if (req.session && req.session.user) {
-    return res.render('signup', { user: true });
+    return res.redirect('dashboard')
   }
   return res.render('signup', { user: false });
 });

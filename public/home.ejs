@@ -64,7 +64,11 @@
     <h1>Welcome to QuickLink</h1>
     <p>Shorten long URLs, manage your links, and share easily. 100% free and fast.</p>
     <div class="cta">
+          <% if (!user) { %>
       <a href="/signup" class="btn btn-light btn-lg">Get Started</a>
+          <% } else { %>
+              <a href="/dashboard" class="btn btn-light btn-lg">Get Started</a>
+            <% } %>
     </div>
   </div>
 
