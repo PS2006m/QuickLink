@@ -120,7 +120,7 @@ app.get('/dashboard',async(req,res)=>{
   var arr=[]
   console.log(obj)
   for(i of obj){
-    arr.push({s: `${req.protocol}://${req.get('host')}/${i.shortId}`,l:i.originalUrl})
+    arr.push({s: `${req.protocol}://${req.get('host')}/${i.shortId}`,l:i.originalUrl,c:i.clicks})
   }
   console.log(arr)
   return res.render('dashboard', { arr :arr, activePage: 'dashboard',user:true });
@@ -175,7 +175,7 @@ app.get('/:shortId', async (req, res) => {
   console.log("I reach here")
   const shortId = req.params.shortId;
   try {
-    const url = await Url.findOne({ shortId });
+    const url = await Url.findOneAndUpdate({ shortId }, { $inc: { clicks: 1 } });
     if (url) {
       res.redirect(url.originalUrl);
     } else {
