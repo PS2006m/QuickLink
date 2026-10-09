@@ -18,14 +18,14 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link <%= (activePage === 'home') ? 'active' : '' %>" href="/">Home</a></li>
          <% if (!user) { %>
-          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-          <li class="nav-item"><a class="nav-link active" href="/signup">Signup</a></li>
+          <li class="nav-item"><a class="nav-link <%= (activePage === 'login') ? 'active' : '' %>" href="/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link <%= (activePage === 'signup') ? 'active' : '' %>" href="/signup">Signup</a></li>
         <% } else { %>
           <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
         <% } %>
-          <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link <%= (activePage === 'dashboard') ? 'active' : '' %>" href="/dashboard">Dashboard</a></li>
         </ul>
       </div>
     </div>
@@ -34,6 +34,9 @@
 
   <div class="container mt-5" style="max-width: 500px;">
     <h2 class="mb-4 text-center">Create Account</h2>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger" role="alert"><%= error %></div>
+    <% } %>
     <form method="POST" action="/signup">
       <div class="mb-3">
         <label>Email</label>

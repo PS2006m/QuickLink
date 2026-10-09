@@ -39,6 +39,15 @@
 
 body > main {
   flex: 1}
+
+    .url-cell {
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -75,27 +84,54 @@ body > main {
 </nav>
 
   <main class="container my-5">
-    <form action="/shorten" method="POST">
+    <form action="/shorten" method="POST" class="mb-4">
       <input type="url" name="originalUrl" placeholder="Enter URL" class="form-control mb-3" required>
       <button type="submit" class="btn btn-primary">Shorten</button>
     </form>
 
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger" role="alert"><%= error %></div>
+    <% } %>
 
   <h1 class="mb-4">Your URLs</h1>
-  <ul class="list-group">
-    <% arr.forEach(function(item) { %>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <span>
-      <a href="<%= item.s %>"><%= item.s %></a> → <a><%= item.l %></a>
-      <span class="badge bg-secondary ms-2"><%= item.c %> clicks</span>
-    </span>
-    <form action="/delete/<%= item.s.split('/').pop() %>" method="POST" onsubmit="return confirm('Are you sure?');" style="margin:0;">
-      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-    </form>
-  </li>
-<% }); %>
 
-  </ul>
+  <% if (!arr.length) { %>
+    <p class="text-muted">You haven't shortened any links yet.</p>
+  <% } else { %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle bg-white">
+      <thead>
+        <tr>
+          <th>Short URL</th>
+          <th>Destination</th>
+          <th>Clicks</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% arr.forEach(function(item) { %>
+        <tr>
+          <td>
+            <a href="<%= item.s %>" target="_blank" rel="noopener"><%= item.s %></a>
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2 copy-btn" data-url="<%= item.s %>">Copy</button>
+          </td>
+          <td>
+            <span class="url-cell" title="<%= item.l %>"><%= item.l %></span>
+          </td>
+          <td><span class="badge bg-secondary"><%= item.c %> clicks</span></td>
+          <td><%= item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US') : '' %></td>
+          <td>
+            <form action="/delete/<%= item.shortId %>" method="POST" onsubmit="return confirm('Are you sure?');" style="margin:0;">
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
 </main>
 
    <footer>
@@ -103,5 +139,27 @@ body > main {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Force a real reload when this page is restored from bfcache (e.g. via
+    // the browser Back button after logout), so the server gets a chance to
+    // redirect to /login if the session is gone instead of showing stale data.
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) {
+        location.reload();
+      }
+    });
+  </script>
+  <script>
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-url');
+        navigator.clipboard.writeText(url).then(function () {
+          var original = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(function () { btn.textContent = original; }, 1500);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
